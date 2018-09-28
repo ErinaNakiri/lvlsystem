@@ -8,7 +8,7 @@
 // @grant        GM_setValue
 // @grant        GM_getValue
 // @grant        GM_deleteValue
-// @downloadURL  https://github.com/ErinaNakiri/lvlsystem/raw/master/download.js
+// @downloadURL  https://raw.githubusercontent.com/ErinaNakiri/lvlsystem/master/download
 // ==/UserScript==
 if(location.href.includes("http://bombparty.sparklinlabs.com/play")) {
     var code = function() {

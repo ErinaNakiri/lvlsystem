@@ -1,0 +1,310 @@
+// ==UserScript==
+// @name         BpLvlsystem
+// @namespace    http://tampermonkey.net/
+// @version      0.1
+// @description  try to take over the world!
+// @author       You
+// @match        http://bombparty.sparklinlabs.com/play/*
+// @grant        GM_setValue
+// @grant        GM_getValue
+// @grant        GM_deleteValue
+// @downloadURL  
+// ==/UserScript==
+if(location.href.includes("http://bombparty.sparklinlabs.com/play")) {
+    var code = function() {
+        if (!(channel.socket && channel.data)) {
+            console.log("Everything's not loaded yet, trying again in a second...");
+            setTimeout(code, 1000);
+            return;
+        }
+        var hote = 0
+        var ltalk = function(msg) {
+            channel.appendToChat("Infos", msg)
+        }
+        var talk = function(msg) {
+            channel.socket.emit(app.user.role === "host" ? "settings:room.welcomeMessage" : "chatMessage", msg)
+        }
+        var Player = {}
+        for(let i=0;i<channel.data.users.length;i++){
+            Player[channel.data.users[i].authId] = {role: channel.data.users[i].role, authId: channel.data.users[i].authId, gainxp:0, unk:0}
+            let b = channel.data.users[i]
+            b.authId.includes("twitch:") ? Player[b.authId].login = "Twitch" : ""
+            b.authId.includes("google:") ? Player[b.authId].login = "Google" : ""
+            b.authId.includes("facebook:") ? Player[b.authId].login = "Facebook" : ""
+            b.authId.includes("twitter:") ? Player[b.authId].login = "Twitter" : ""
+            b.authId.includes("steam:") ? Player[b.authId].login = "Steam" : ""
+            b.authId.includes("guest:") ? Player[b.authId].login = "Guest" : ""
+        }
+        var interface = function() {
+            var botHTML = document.createElement("div");
+            botHTML.innerHTML = `
+<h2 id="xd" style="text-shadow: black 0px 0px 0px;">Paramètres du bot...</h2>
+<button id="Activation" class="BanUser">Activer bot</button>`
+            document.querySelector("#SettingsTab").appendChild(botHTML)
+            var boton = document.getElementById("Activation")
+            boton.onclick = function() {
+                interface2()
+                ltalk("Le bot a bien été activé.")
+                bot = 1
+            }
+        }
+         if(app.user.role === "host") {
+            ltalk("Vous êtes hôte. Rendez-vous dans les options pour activer le bot.")
+            interface()
+            hote = 1
+        }
+        var interface2 = function() {
+            var botHTML = document.createElement("div");
+            botHTML.innerHTML = `
+
+<div id="CommandesBotDev" style="margin-left: 8px; display: block;">
+<table id="commandesBotTable">
+<tr>
+<td>Paramètre 1</td>
+<td><select id="Pas encore disponible.">
+<option value="off">-</option>
+<option value="on">-</option>
+</select></td>
+</tr>
+<tr>
+<td>Pas encore disponible.</td>
+<td><select id="Parametre2">
+<option value="off">-</option>
+<option value="on">-</option>
+</select></td>
+</tr>
+<tr>
+<td>Pas encore disponible.</td>
+<td><select id="Parametre3">
+<option value="a">-</option>
+<option value="b">-</option>
+<option value="c">-</option>
+<option value="d">-</option>
+<option value="e">-</option>
+</select></td>
+</tr>
+</table>
+</div>
+<button id="CommandesBotBouton" class="BanUser">Confirmer</button>`;
+            /*
+var botCSS = document.createElement("style");
+	botCSS.innerHTML = ``;
+document.head.appendChild(botHTML)
+*/
+            document.querySelector("#SettingsTab").appendChild(botHTML)
+        }
+        var bot = 0
+        var load = 0
+        var reset = 0
+        var lvlup = function(id) {
+            let b = Player[id].xpscr;
+            let c = Player[id].lvlup
+            let d = Player[id]
+            if(c <= b) {
+                if(d.authId === app.user.authId || app.user.role === "host") {
+                    Player[id].xpscr -= c
+                    Player[id].lvlscr += 1
+                    Player[id].lvlup = 20 * d.lvlscr
+                    let e = channel.data.usersByAuthId[d.authId].displayName
+                    if(app.user.role === "host") {
+                        talk(e + " vient de monter de niveau ! (lvl: " + d.lvlscr + ")")
+                    }
+                }
+            }
+        }
+        if(app.user.role != "host") {
+            ltalk("En attente de synchronisation avec le bot... faites .load si le bot est activé.")
+        }
+        if(GM_getValue("lvl")===undefined) {
+            GM_setValue("lvl", "LVL:0")
+            GM_setValue("xp", "XP:0")
+            let a = "ID:"
+            for(let b=0; b<=27;b++) {
+                let c = Math.floor(Math.random() * 36)
+                a += [..."ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"][c]
+            }
+            GM_setValue("id", a)
+        }
+        channel.socket.on("settings:room.welcomeMessage", a=> {
+            let b = app.user.displayName
+            let c = "Votre sauvegarde sera synchronisée à la prochaine partie, " + b + " !"
+            let d = "Bienvenue, " + b.displayName + " (lvl: "
+            let e = Player[app.user.authId]
+            if(a===c) {
+                Player[app.user.authId].load = 1
+                Player[app.user.authId].id = 1
+                ltalk("Synchronisation en cours... veuillez rejoindre la prochaine partie et ne touchez à rien...")
+                console.log(Player)
+            } if(a.includes(d)) {
+                Player[app.user.authId].gainxp = 1
+                Player[app.user.authId].lvlup = e.lvlscr == 0 ? 20 : 20 * e.lvlscr
+                ltalk("Vous pouvez désormais gagner de l'xp !")
+                Player[app.user.authId].streak = 0
+            } if(a==="Problème lors de la connexion, " + b) {
+                ltalk("Si vous voyez ce message, c'est probablement parce que vous avez tenté de tricher ou que vous avez un double compte. Veuillez revenir sur votre compte précédent.")
+                Player[app.user.authId].load = 0
+            }
+        })
+        channel.socket.on("addUser", a=> {
+            Player[a.authId] = {authId: a.authId, gainxp:0, unk:0}
+            let b = channel.data.usersByAuthId[a.authId]
+            b.authId.includes("twitch:") ? Player[a.authId].login = "Twitch" : ""
+            b.authId.includes("google:") ? Player[a.authId].login = "Google" : ""
+            b.authId.includes("facebook:") ? Player[a.authId].login = "Facebook" : ""
+            b.authId.includes("twitter:") ? Player[a.authId].login = "Twitter" : ""
+            b.authId.includes("steam:") ? Player[a.authId].login = "Steam" : ""
+            b.authId.includes("guest:") ? Player[a.authId].login = "Guest" : ""
+        })
+        channel.socket.on("winWord", a=> {
+            let b = channel.data.actorsByAuthId[a.playerAuthId]
+            let c = Player[b.authId]
+            if(c.gainxp != undefined) {
+                if(c.gainxp)
+                    if(b.authId === app.user.authId || app.user.role === "host") {
+                        Player[b.authId].xpscr += b.lastWord.length + c.streak
+                        lvlup(b.authId)
+                        if(b.lastWord.length >= 20) {
+                            Player[b.authId].streak += 1
+                            if(c.streak >= 3 && app.user.role === "host") {
+                                talk("Suite de longs pour " + b.displayName + " ! (" + c.streak + ")")
+                            }
+                        } else {
+                            if(c.streak >= 3 && app.user.role === "host") {
+                                talk("Bris de suite de longs pour " + b.displayName + " ! (" + c.streak + ")")
+                            }
+                            Player[b.authId].streak = 0
+                        }
+                    }
+            }
+        })
+        channel.socket.on("setActivePlayerIndex", a=> {
+            var enter = function() {
+                let b = Player[app.user.authId]
+                if(b.load===1 && channel.data.actors[a] === channel.data.actorsByAuthId[app.user.authId]) {
+                    channel.socket.emit("setWord", {word:GM_getValue("id"), validate:true})
+                } else if(b.getlvl) {
+                    channel.socket.emit("setWord", {word:GM_getValue("lvl"), validate:true})
+                } else if(b.getxp) {
+                    channel.socket.emit("setWord", {word:GM_getValue("xp"), validate:true})
+                }
+                if(Player[app.user.authId].xpscr === undefined) {
+                    setTimeout(enter, 1000)
+                    return;
+                }
+            }
+            enter()
+        })
+        channel.socket.on("failWord", a=> {
+            if(bot || app.user.authId === a.playerAuthId) {
+                let b = Player[a.playerAuthId]
+                let c = channel.data.actorsByAuthId[a.playerAuthId]
+                if(b != undefined) {
+                    if(b.load===1 && c.lastWord.includes("ID:")) {
+                        Player[a.playerAuthId].loginId = c.lastWord.substr(3).split(" ")
+                        if(GM_getValue(Player[a.playerAuthId].loginId) === undefined && Player[a.playerAuthId].loginId.length === 27) {
+                        Player[a.playerAuthId].getlvl = 1
+                        load = -1
+                        Player[a.playerAuthId].load = 0
+                        GM_setValue(Player[a.playerAuthId].loginId, Player[a.playerAuthId].loginId)
+                        } else {
+                            talk("Problème lors de la connexion, " + c.displayName)
+                        }
+                    } else if(b.getlvl && c.lastWord.includes("LVL:")) {
+                        Player[a.playerAuthId].lvlscr = Number(c.lastWord.substr(4).split(" "))
+                        Player[a.playerAuthId].getxp = 1
+                        Player[a.playerAuthId].getlvl = 0
+                    } else if(b.getxp && c.lastWord.includes("XP:")) {
+                        Player[a.playerAuthId].xpscr = Number(c.lastWord.substr(3).split(" "))
+                        Player[a.playerAuthId].getxp = 0
+                        b.gainxp = 1
+                        if(app.user.authId === a.playerAuthId) {
+                        ltalk("Vous pouvez jouer")
+                        }
+                        channel.socket.emit("setWord", {word: " ", validate: true})
+                        if(app.user.role === "host") {
+                            talk("Votre sauvegarde a été effectuée correctement !")
+                            talk("Bienvenue, " + c.displayName + " (lvl: " + b.lvlscr + ") !")
+                        }
+                        b.gainxp = 1
+                        b.lvlup = b.lvlscr == 0 ? 20 : 20 * b.lvlscr
+                        b.streak = 0
+                    }
+                }
+            }
+        })
+        channel.socket.on("removeUser", a=> {
+            let b = channel.data.usersByAuthId[app.user.authId]
+            if(hote===0 && b.role === "host") {
+                ltalk("Vous êtes désormais hôte. Rendez-vous dans les options pour activer le bot.")
+                interface()
+                hote = 1
+            }
+            if(Player[a].role === "host") {
+                Player[a].gainxp = 0
+                GM_setValue("lvl", "LVL:" + Player[app.user.authId].lvlscr)
+                GM_setValue("xp", "XP:" + Player[app.user.authId].xpscr)
+                ltalk("L'hôte est parti. Votre progression a été sauvegardée. Vous ne pouvez plus accumuler d'xp.")
+            }
+        })
+        channel.socket.on("chatMessage", a=> {
+            if(app.user.role==="host" && hote ===0) {
+                 ltalk("Vous êtes désormais hôte. Rendez-vous dans les options pour activer le bot.")
+                interface()
+                hote = 1
+            }
+            let b = channel.data.usersByAuthId[a.userAuthId]
+            let c = Player[b.authId]
+            let cmd = a.text.substr(1).split(" ")
+            let isCmd = ~["/", "."].indexOf(a.text[0])
+            if (isCmd && a.text.trim().length > 1) {
+                if(~["load"].indexOf(cmd[0]) && c.load===undefined && bot) {
+                    talk("Votre sauvegarde sera synchronisée à la prochaine partie, " + b.displayName + " !")
+                    Player[b.authId].load = 1
+                } else if(~["save"].indexOf(cmd[0]) && c.gainxp && app.user.authId === b.authId) {
+                    GM_setValue("lvl", "LVL:" + c.lvlscr)
+                    GM_setValue("xp", "XP:" + c.xpscr)
+                    ltalk("Progression sauvegardée.")
+                } else if(~["progress"].indexOf(cmd[0]) && bot) {
+                    if(cmd.length===1 && Player[b.authId].gainxp) {
+                        talk(b.displayName + ": [lvl: " + Player[b.authId].lvlscr + "] XP: " + Player[b.authId].xpscr + "/" + Player[b.authId].lvlup + "(" + Math.round(Player[b.authId].xpscr/Player[b.authId].lvlup * 100) + "%)")
+                    } else {
+                        let user = channel.data.users.filter(x=>~x.displayName.toLowerCase().indexOf(cmd[1].toLowerCase()));
+                        if(user.length > 1 && !Player[b.authId].unk) {
+                            talk("Plusieurs personnes correspondent à votre recherche. Indiquez le numéro correspondant.")
+                            var j = ""
+                            Player[b.authId].none = []
+                            Player[b.authId].unk = 1
+                            Player[b.authId].unkp = 1
+                            for(let i=0; i<user.length;i++) {
+                                j += (i+1).toString() + ". " + user[i].displayName + " "
+                                if(Player[user[i].authId].login != "Guest") {
+                                    j += "[Connecté sur : " + Player[user[i].authId].login + "] "
+                                }
+                                Player[b.authId].none.push(user[i].authId)
+                                if(i === user.length - 1) {
+                                    talk(j)
+                                }
+                            }
+                        }
+                    }
+                }
+            } else if(Player[b.authId].unk && !isNaN(Number(a.text))) {
+                if(Number(a.text) <= Player[b.authId].none.length && Number(a.text) > 0) {
+                    let d = Player[b.authId].none[Math.round(Number(a.text)) - 1]
+                    if(c.unkp && Player[d].gainxp) {
+                        talk(b.displayName + ": [lvl: " + Player[d].lvlscr + "] XP: " + Player[d].xpscr + "/" + Player[d].lvlup + "(" + Math.round(Player[d].xpscr/Player[d].lvlup * 100) + "%)")
+                        Player[b.authId].unk = 0
+                        Player[b.authId].unkp= 0
+                        Player[b.authId].none = []
+                    } else if(!Player[d].gainxp) {
+                        talk("Le joueur n'est pas actuellement connecté.")
+                        Player[b.authId].unk = 0
+                        Player[b.authId].unkp= 0
+                        Player[b.authId].none = []
+                    }
+                }
+            }
+        })
+    }
+    code()
+}

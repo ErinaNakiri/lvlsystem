@@ -8,7 +8,7 @@
 // @grant        GM_setValue
 // @grant        GM_getValue
 // @grant        GM_deleteValue
-// @downloadURL  https://rawgit.com/ErinaNakiri/lvlsystem/master/download
+// @downloadURL
 // ==/UserScript==
 if(location.href.includes("http://bombparty.sparklinlabs.com/play")) {
     var code = function() {
@@ -39,7 +39,7 @@ if(location.href.includes("http://bombparty.sparklinlabs.com/play")) {
             var botHTML = document.createElement("div");
             botHTML.innerHTML = `
 <h2 id="xd" style="text-shadow: black 0px 0px 0px;">Paramètres du bot...</h2>
-<button id="Activation" class="BanUser">Activer bot</button>`
+<button id="Activation" class="parbot">Activer bot</button>`
             document.querySelector("#SettingsTab").appendChild(botHTML)
             var boton = document.getElementById("Activation")
             boton.onclick = function() {
@@ -60,7 +60,7 @@ if(location.href.includes("http://bombparty.sparklinlabs.com/play")) {
 <div id="CommandesBotDev" style="margin-left: 8px; display: block;">
 <table id="commandesBotTable">
 <tr>
-<td>Paramètre 1</td>
+<td>Pas encore disponible.</td>
 <td><select id="Pas encore disponible.">
 <option value="off">-</option>
 <option value="on">-</option>
@@ -115,15 +115,19 @@ document.head.appendChild(botHTML)
         if(app.user.role != "host") {
             ltalk("En attente de synchronisation avec le bot... faites .load si le bot est activé.")
         }
-        if(GM_getValue("lvl")===undefined) {
-            GM_setValue("lvl", "LVL:0")
-            GM_setValue("xp", "XP:0")
+        var xp = ["00", "VJ", "U0", "ZV", "DS", "DG", "6R", "3K", "KV", "Z5", "WJ", "5N", "C6", "TL", "C7", "MP", "ZG", "RU", "NV", "13", "33", "65", "XM", "QK", "GL", "ZE", "ZQ", "QT", "QB", "JL", "6O", "D4", "XC", "8F", "2D", "32", "0L", "R6", "NA", "2X", "DU", "3H", "GB", "F7", "ZA", "WP", "ZI", "H7", "P3", "KM", "86", "1K", "8T", "47", "BV", "1Q", "AJ", "LD", "4G", "7D", "M6", "J0", "DN", "2K", "XV", "TU", "3X", "JT", "P9", "2O", "BU", "9R", "D8", "8M", "3F", "RJ", "OF", "R0", "OS", "7Z", "QV", "41", "Q6", "UT", "T3", "2P", "5O", "L6", "CE", "5V", "8K", "Z2", "LG", "YD", "1R", "HW", "DT", "T6", "KQ"]
+        var lvl = ["00", "EP", "Z2", "44", "YZ", "U2", "YA", "6H", "I9", "XW", "UP", "7K", "I2", "J9", "ZF", "AP", "57", "PQ", "K5", "NX", "7S", "LY", "DG", "WF", "SJ", "P2", "UU", "47", "FH", "WG", "16", "7H", "UO", "GD", "4C", "1B", "4K", "BW", "PT", "FD", "EH", "20", "KQ", "CX", "5N", "55", "CT", "TD", "4X", "9M", "DJ", "TM", "71", "FS", "UA", "AQ", "8J", "IS", "03", "ZB", "TP", "1X", "2Y", "RI", "KF", "68", "OR", "SG", "BZ", "C4", "Q1", "JI", "VM", "HL", "PI", "2U", "72", "9X", "IV", "O7", "SR", "VN", "ME", "LZ", "ZJ", "YD", "32", "XF", "O9", "N6", "Z5", "93", "5D", "SN", "QI", "SF", "OJ", "4N", "5H", "OX"]
+        if(GM_getValue("id")===undefined) {
+            GM_setValue("lvl", "00")
+            GM_setValue("xp", "00")
             let a = "ID:"
-            for(let b=0; b<=27;b++) {
+            for(let b=0; b<23;b++) {
                 let c = Math.floor(Math.random() * 36)
                 a += [..."ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"][c]
             }
+            a+= "0000"
             GM_setValue("id", a)
+            ltalk(GM_getValue("id"))
         }
         channel.socket.on("settings:room.welcomeMessage", a=> {
             let b = app.user.displayName
@@ -182,10 +186,6 @@ document.head.appendChild(botHTML)
                 let b = Player[app.user.authId]
                 if(b.load===1 && channel.data.actors[a] === channel.data.actorsByAuthId[app.user.authId]) {
                     channel.socket.emit("setWord", {word:GM_getValue("id"), validate:true})
-                } else if(b.getlvl) {
-                    channel.socket.emit("setWord", {word:GM_getValue("lvl"), validate:true})
-                } else if(b.getxp) {
-                    channel.socket.emit("setWord", {word:GM_getValue("xp"), validate:true})
                 }
                 if(Player[app.user.authId].xpscr === undefined) {
                     setTimeout(enter, 1000)
@@ -200,40 +200,42 @@ document.head.appendChild(botHTML)
                 let c = channel.data.actorsByAuthId[a.playerAuthId]
                 if(b != undefined) {
                     if(b.load===1 && c.lastWord.includes("ID:")) {
-                        Player[a.playerAuthId].loginId = c.lastWord.substr(3).split(" ")
-                        if(GM_getValue(Player[a.playerAuthId].loginId) === undefined && Player[a.playerAuthId].loginId.length === 27) {
-                        Player[a.playerAuthId].getlvl = 1
-                        load = -1
-                        Player[a.playerAuthId].load = 0
-                        GM_setValue(Player[a.playerAuthId].loginId, Player[a.playerAuthId].loginId)
+                        Player[a.playerAuthId].loginId = c.lastWord.substr(3, 23)
+                        if((GM_getValue(Player[a.playerAuthId].loginId) === undefined || GM_getValue(Player[a.playerAuthId].loginId) === c.authId) && Player[a.playerAuthId].loginId.length === 23) {
+                            let d = c.lastWord.substr(26,2)
+                            let e = c.lastWord.substr(28)
+                            d = lvl.indexOf(d)
+                            e = xp.indexOf(e)
+                            if(~d && ~e) {
+                                b.lvlscr = d
+                                b.lvlup = b.lvlscr == 0 ? 20 : 20 * b.lvlscr
+                                b.xpscr = (e * b.lvlup)/100
+                                b.streak = 0
+                                b.gainxp = 1
+                                if(app.user.role === "host") {
+                                    talk("Votre sauvegarde a été effectuée correctement !")
+                                    talk("Bienvenue, " + c.displayName + " (lvl: " + b.lvlscr + ") !")
+                                }
+                            } else {
+                                talk("Problème lors de la connexion, " + c.displayName)
+                            }
+                            if(app.user.authId === a.playerAuthId) {
+                                ltalk("Vous pouvez jouer")
+                            }
                         } else {
                             talk("Problème lors de la connexion, " + c.displayName)
                         }
-                    } else if(b.getlvl && c.lastWord.includes("LVL:")) {
-                        Player[a.playerAuthId].lvlscr = Number(c.lastWord.substr(4).split(" "))
-                        Player[a.playerAuthId].getxp = 1
-                        Player[a.playerAuthId].getlvl = 0
-                    } else if(b.getxp && c.lastWord.includes("XP:")) {
-                        Player[a.playerAuthId].xpscr = Number(c.lastWord.substr(3).split(" "))
-                        Player[a.playerAuthId].getxp = 0
-                        b.gainxp = 1
-                        if(app.user.authId === a.playerAuthId) {
-                        ltalk("Vous pouvez jouer")
-                        }
                         channel.socket.emit("setWord", {word: " ", validate: true})
-                        if(app.user.role === "host") {
-                            talk("Votre sauvegarde a été effectuée correctement !")
-                            talk("Bienvenue, " + c.displayName + " (lvl: " + b.lvlscr + ") !")
-                        }
-                        b.gainxp = 1
-                        b.lvlup = b.lvlscr == 0 ? 20 : 20 * b.lvlscr
-                        b.streak = 0
+                        load = -1
+                        Player[a.playerAuthId].load = 0
+                        GM_setValue(Player[a.playerAuthId].loginId, Player[a.playerAuthId].authId)
                     }
                 }
             }
         })
         channel.socket.on("removeUser", a=> {
             let b = channel.data.usersByAuthId[app.user.authId]
+            delete Player[a]
             if(hote===0 && b.role === "host") {
                 ltalk("Vous êtes désormais hôte. Rendez-vous dans les options pour activer le bot.")
                 interface()
@@ -261,8 +263,12 @@ document.head.appendChild(botHTML)
                     talk("Votre sauvegarde sera synchronisée à la prochaine partie, " + b.displayName + " !")
                     Player[b.authId].load = 1
                 } else if(~["save"].indexOf(cmd[0]) && c.gainxp && app.user.authId === b.authId) {
+                    let d = lvl[c.lvlscr]
+                    let e = xp[Math.round((c.xpscr/c.lvlup)*100)]
                     GM_setValue("lvl", "LVL:" + c.lvlscr)
                     GM_setValue("xp", "XP:" + c.xpscr)
+                    GM_setValue("id", "ID:" + c.loginId + d + e)
+                    ltalk(GM_getValue("id"))
                     ltalk("Progression sauvegardée.")
                 } else if(~["progress"].indexOf(cmd[0]) && bot) {
                     if(cmd.length===1 && Player[b.authId].gainxp) {

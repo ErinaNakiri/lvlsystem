@@ -241,7 +241,7 @@ document.head.appendChild(botHTML)
                 interface()
                 hote = 1
             }
-            if(Player[a].role === "host") {
+            if(b.role === "host") {
                 Player[a].gainxp = 0
                 GM_setValue("lvl", "LVL:" + Player[app.user.authId].lvlscr)
                 GM_setValue("xp", "XP:" + Player[app.user.authId].xpscr)

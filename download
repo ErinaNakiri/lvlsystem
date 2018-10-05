@@ -104,7 +104,7 @@ document.head.appendChild(botHTML)
                 if(d.authId === app.user.authId || app.user.role === "host") {
                     Player[id].xpscr -= c
                     Player[id].lvlscr += 1
-                    Player[id].lvlup = (20 * (Math.pow(d.lvlscr, 2))) - (20 * d.lvlscr)
+                    Player[id].lvlup = (20 * (Math.pow(d.lvlscr, 2))) - (20 * d.lvlscr) + 20
                     let e = channel.data.usersByAuthId[d.authId].displayName
                     if(app.user.role === "host") {
                         talk(e + " vient de monter de niveau ! (lvl: " + d.lvlscr + ")")
@@ -212,7 +212,7 @@ document.head.appendChild(botHTML)
                             e = xp.indexOf(e)
                             if(~d && ~e) {
                                 b.lvlscr = d
-                                b.lvlup = b.lvlscr == 0 ? 20 : (20 * (Math.pow(b.lvlscr, 2))) - (20 * b.lvlscr)
+                                b.lvlup = b.lvlscr == 0 ? 20 : (20 * (Math.pow(b.lvlscr, 2))) - (20 * b.lvlscr) + 20
                                 b.xpscr = (e * b.lvlup)/100
                                 b.streak = 0
                                 b.gainxp = 1

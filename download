@@ -132,7 +132,6 @@ document.head.appendChild(botHTML)
             }
             a+= "0000"
             GM_setValue("id", a)
-            ltalk(GM_getValue("id"))
         }
         channel.socket.on("settings:room.welcomeMessage", a=> {
             let b = app.user.displayName
@@ -273,7 +272,6 @@ document.head.appendChild(botHTML)
                     GM_setValue("lvl", "LVL:" + c.lvlscr)
                     GM_setValue("xp", "XP:" + c.xpscr)
                     GM_setValue("id", "ID:" + c.loginId + d + e)
-                    ltalk(GM_getValue("id"))
                     ltalk("Progression sauvegardée.")
                 } else if(~["progress"].indexOf(cmd[0]) && bot) {
                     if(cmd.length===1 && Player[b.authId].gainxp) {

@@ -104,13 +104,18 @@ document.head.appendChild(botHTML)
                 if(d.authId === app.user.authId || app.user.role === "host") {
                     Player[id].xpscr -= c
                     Player[id].lvlscr += 1
-                    Player[id].lvlup = 20 * d.lvlscr
+                    Player[id].lvlup = 20 * (d.lvlscr ^ 2) - (20 * d.lvlscr)
                     let e = channel.data.usersByAuthId[d.authId].displayName
                     if(app.user.role === "host") {
                         talk(e + " vient de monter de niveau ! (lvl: " + d.lvlscr + ")")
                     }
                 }
             }
+        }
+        if(GM_getValue("update0000") === undefined && GM_getValue("id") != undefined) {
+            GM_deleteValue("id")
+            GM_setValue("update0000", 1)
+            ltalk("Une update vient d'avoir lieu. Vos niveaux ont été remis à zéro.")
         }
         if(app.user.role != "host") {
             ltalk("En attente de synchronisation avec le bot... faites .load si le bot est activé.")
@@ -208,7 +213,7 @@ document.head.appendChild(botHTML)
                             e = xp.indexOf(e)
                             if(~d && ~e) {
                                 b.lvlscr = d
-                                b.lvlup = b.lvlscr == 0 ? 20 : 20 * b.lvlscr
+                                b.lvlup = b.lvlscr == 0 ? 20 : 20 * (b.lvlscr ^ 2) - (20 * b.lvlscr)
                                 b.xpscr = (e * b.lvlup)/100
                                 b.streak = 0
                                 b.gainxp = 1

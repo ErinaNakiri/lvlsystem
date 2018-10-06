@@ -195,23 +195,23 @@ document.head.appendChild(botHTML)
         channel.socket.on("winWord", a=> {
             let b = channel.data.actorsByAuthId[a.playerAuthId]
             let c = Player[b.authId]
+            let y = []
+            if(syllabes && app.user.role === "host") {
+                Object.keys(actsyllabe).map(function(d) {
+                    let x = actsyllabe[d].indexOf(b.lastWord)
+                    if(~x) {
+                        actsyllabe[d].splice(x, 1)
+                        if(actsyllabe[d].length === 0) {
+                            y.push(d)
+                        }
+                    }
+                })
+                if(y.length > 0) {
+                    talk(b.displayName + " a niqué " + (y.length > 1 ? "les syllabes : " : "la syllabe : ") + y.join(", ") + (c.gainxp ? "(+" + (20 * y.length) + "xp)" : null))
+                    c.gainxp ? c.xpscr += 20 * y.length : null
+                    y = []
+            }
             if(c.gainxp != undefined) {
-                if(syllabes && app.user.role === "host") {
-                    Object.keys(actsyllabe).map(function(d) {
-                        let x = actsyllabe[d].indexOf(b.lastWord)
-                        let y = []
-                        if(~x) {
-                            actsyllabe[d].splice(x, 1)
-                            if(actsyllabe[d].length === 0) {
-                                y.push(d)
-                            }
-                        }
-                        if(c.length > 0) {
-                            talk(b.displayName + " a niqué " + (y.length > 1 ? "les syllabes : " : "la syllabe : ") + y.join(", ") + (c.gainxp ? "(+" + (20 * y.length) + "xp)" : null))
-                            c.gainxp ? c.xpscr += 20 * y.length : null
-                        }
-                    })
-                }
                 if(c.gainxp)
                     if(b.authId === app.user.authId || app.user.role === "host") {
                         Player[b.authId].xpscr += b.lastWord.length + c.streak
@@ -233,6 +233,7 @@ document.head.appendChild(botHTML)
         channel.socket.on("setState", a => {
             if(a === "waitingForPlayers") {
                 actsyllabe = syll
+                console.log(actsyllabe)
             }
         })
         channel.socket.on("setActivePlayerIndex", a=> {

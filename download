@@ -197,20 +197,37 @@ document.head.appendChild(botHTML)
             let c = Player[b.authId]
             let y = []
             if(syllabes) {
-                Object.keys(actsyllabe).map(function(d) {
-                    let x = actsyllabe[d].indexOf(b.lastWord)
-                    if(~x) {
-                        actsyllabe[d].splice(x, 1)
-                        if(actsyllabe[d].length === 0) {
-                            y.push(d)
+                let trysyll = function() {
+                    Object.keys(actsyllabe).map(function(d) {
+                        let x = actsyllabe[d].indexOf(b.lastWord)
+                        let names = []
+                        let authId = []
+                        if(channel.data.wordRoot === d && syll[d].length === 0) {
+                            for(let i=0;i<channel.data.actors.length;i++) {
+                                if(channel.data.actors[i].state == "alive") {
+                                    names.push(channel.data.actors[i].displayName)
+                                    authId.push(channel.data.actors[i].authId)
+                                }
+                            }
+                            app.user.role == "host" ? talk("LES JOUEURS " + names.join(", ") + " ONT RÉUSSI UN ALPHA ! (+300xp)") : null
+                            for(let i=0; i<authId; i++) {
+                                Player[authId[i]].gainxp ? Player[authId[i]].xpscr += 300 : null
+                            }
                         }
+                        if(~x) {
+                            actsyllabe[d].splice(x, 1)
+                            if(actsyllabe[d].length === 0) {
+                                y.push(d)
+                            }
+                        }
+                    })
+                    if(y.length > 0) {
+                        app.user.role == "host" ? talk(b.displayName + " a niqué " + (y.length > 1 ? "les syllabes : " : "la syllabe : ") + y.join(", ") + (c.gainxp ? "(+" + (20 * y.length) + "xp)" : "")) : null
+                        c.gainxp ? c.xpscr += 20 * y.length : null
+                        y = []
                     }
-                })
-                if(y.length > 0) {
-                    app.user.role == "host" ? talk(b.displayName + " a niqué " + (y.length > 1 ? "les syllabes : " : "la syllabe : ") + y.join(", ") + (c.gainxp ? "(+" + (20 * y.length) + "xp)" : "")) : null
-                    c.gainxp ? c.xpscr += 20 * y.length : null
-                    y = []
                 }
+                setTimeout(trysyll(), 1000)
             }
             if(c.gainxp != undefined) {
                 if(c.gainxp)

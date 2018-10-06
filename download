@@ -210,6 +210,7 @@ document.head.appendChild(botHTML)
                     talk(b.displayName + " a niqué " + (y.length > 1 ? "les syllabes : " : "la syllabe : ") + y.join(", ") + (c.gainxp ? "(+" + (20 * y.length) + "xp)" : null))
                     c.gainxp ? c.xpscr += 20 * y.length : null
                     y = []
+                }
             }
             if(c.gainxp != undefined) {
                 if(c.gainxp)

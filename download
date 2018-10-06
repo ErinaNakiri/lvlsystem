@@ -356,7 +356,7 @@ document.head.appendChild(botHTML)
                 if(Number(a.text) <= Player[b.authId].none.length && Number(a.text) > 0) {
                     let d = Player[b.authId].none[Math.round(Number(a.text)) - 1]
                     if(c.unkp && Player[d].gainxp) {
-                        talk(channel.data.users[d.authId].displayName + ": [lvl: " + Player[d].lvlscr + "] XP: " + Player[d].xpscr + "/" + Player[d].lvlup + "(" + Math.round(Player[d].xpscr/Player[d].lvlup * 100) + "%)")
+                        talk(channel.data.users[Player[d].authId].displayName + ": [lvl: " + Player[d].lvlscr + "] XP: " + Player[d].xpscr + "/" + Player[d].lvlup + "(" + Math.round(Player[d].xpscr/Player[d].lvlup * 100) + "%)")
                         Player[b.authId].unk = 0
                         Player[b.authId].unkp= 0
                         Player[b.authId].none = []

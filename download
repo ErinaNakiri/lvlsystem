@@ -35,6 +35,7 @@ if(location.href.includes("http://bombparty.sparklinlabs.com/play")) {
             b.authId.includes("steam:") ? Player[b.authId].login = "Steam" : ""
             b.authId.includes("guest:") ? Player[b.authId].login = "Guest" : ""
         }
+        var actsyllabe = {}
         var syllabes = 0
         var interface = function() {
             var botHTML = document.createElement("div");
@@ -196,12 +197,12 @@ document.head.appendChild(botHTML)
             let c = Player[b.authId]
             if(c.gainxp != undefined) {
                 if(syllabes && app.user.role === "host") {
-                    Object.keys(syll).map(function(d) {
-                        let x = syll[d].indexOf(b.lastWord)
+                    Object.keys(actsyllabe).map(function(d) {
+                        let x = actsyllabe[d].indexOf(b.lastWord)
                         let y = []
-                        if(~b) {
-                            syll[d].splice(x, 1)
-                            if(syll[d].length === 0) {
+                        if(~x) {
+                            actsyllabe[d].splice(x, 1)
+                            if(actsyllabe[d].length === 0) {
                                 y.push(d)
                             }
                         }
@@ -227,6 +228,11 @@ document.head.appendChild(botHTML)
                             Player[b.authId].streak = 0
                         }
                     }
+            }
+        })
+        channel.socket.on("setState", a => {
+            if(a === "waitingForPlayers") {
+                actsyllabe = syll
             }
         })
         channel.socket.on("setActivePlayerIndex", a=> {

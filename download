@@ -196,7 +196,7 @@ document.head.appendChild(botHTML)
             let b = channel.data.actorsByAuthId[a.playerAuthId]
             let c = Player[b.authId]
             let y = []
-            if(syllabes && app.user.role === "host") {
+            if(syllabes) {
                 Object.keys(actsyllabe).map(function(d) {
                     let x = actsyllabe[d].indexOf(b.lastWord)
                     if(~x) {
@@ -207,7 +207,7 @@ document.head.appendChild(botHTML)
                     }
                 })
                 if(y.length > 0) {
-                    talk(b.displayName + " a niqué " + (y.length > 1 ? "les syllabes : " : "la syllabe : ") + y.join(", ") + (c.gainxp ? "(+" + (20 * y.length) + "xp)" : ""))
+                    app.user.role == "host" ? talk(b.displayName + " a niqué " + (y.length > 1 ? "les syllabes : " : "la syllabe : ") + y.join(", ") + (c.gainxp ? "(+" + (20 * y.length) + "xp)" : "")) : null
                     c.gainxp ? c.xpscr += 20 * y.length : null
                     y = []
                 }

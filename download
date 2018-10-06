@@ -213,7 +213,7 @@ document.head.appendChild(botHTML)
                             if(~d && ~e) {
                                 b.lvlscr = d
                                 b.lvlup = b.lvlscr == 0 ? 20 : (20 * (Math.pow(b.lvlscr, 2))) - (20 * b.lvlscr) + 20
-                                b.xpscr = (e * b.lvlup)/100
+                                b.xpscr = Math.round((e * b.lvlup)/100)
                                 b.streak = 0
                                 b.gainxp = 1
                                 if(app.user.role === "host") {

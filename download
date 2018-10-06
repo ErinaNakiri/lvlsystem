@@ -295,7 +295,7 @@ document.head.appendChild(botHTML)
                                 }
                             }
                         } else if(user.length === 1 && Player[user[0].authId].gainxp) {
-                            talk(user[0].displayName + ": [lvl: " + Player[user[0].authId].lvlscr + "] XP: " + Player[user[0].authId].xpscr + "/" + Player[user[0].authId].lvlup + "(" + Math.round(Player[b.authId].xpscr/Player[user[0].authId].lvlup * 100) + "%)")
+                            talk(user[0].displayName + ": [lvl: " + Player[user[0].authId].lvlscr + "] XP: " + Player[user[0].authId].xpscr + "/" + Player[user[0].authId].lvlup + "(" + Math.round(Player[user[0].authId].xpscr/Player[user[0].authId].lvlup * 100) + "%)")
 
                         }
                     }

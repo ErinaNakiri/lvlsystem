@@ -207,7 +207,7 @@ document.head.appendChild(botHTML)
                     }
                 })
                 if(y.length > 0) {
-                    talk(b.displayName + " a niqué " + (y.length > 1 ? "les syllabes : " : "la syllabe : ") + y.join(", ") + (c.gainxp ? "(+" + (20 * y.length) + "xp)" : null))
+                    talk(b.displayName + " a niqué " + (y.length > 1 ? "les syllabes : " : "la syllabe : ") + y.join(", ") + (c.gainxp ? "(+" + (20 * y.length) + "xp)" : ""))
                     c.gainxp ? c.xpscr += 20 * y.length : null
                     y = []
                 }
